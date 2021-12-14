@@ -1,5 +1,3 @@
-// const db = require('./db/connection');//change password before submitting
-// const mysql2 = require("mysql2");
 const inquirer = require("inquirer");
 require("console.table");
 const mysql = require("mysql2");
@@ -16,12 +14,27 @@ const db = mysql.createConnection({
 
 db.connect(function (err) {
   if (err) throw err;
-  console.log("connected to database");
-  console.log(`
-`)
-  // runs the app
-  // Prompt();
+  console.log(`Welcome to the EMPLOYEE MANAGER`)
+
+  // function call here to start the initial app prompts
+  initPrompts()
 });
+
+function initPrompts(){
+  inquirer.prompt({
+    type: "list",
+    name: "task",
+    message: "What would you like to do?",
+    choices: [
+      "View Employees",
+      "View Employees by Department",
+      "Add Employee",
+      "Remove Employees",
+      "Update Employee Role",
+      "Add Role",
+      "End"]
+  })
+};
 
 
 
