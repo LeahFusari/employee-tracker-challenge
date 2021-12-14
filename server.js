@@ -1,26 +1,29 @@
-const db = require('./db/connection');
-const express = require('express');
-const routes = require('./routes');
-const PORT = process.env.PORT || 3001;
-const app = express();
+// const db = require('./db/connection');//change password before submitting
+// const mysql2 = require("mysql2");
+const inquirer = require("inquirer");
+require("console.table");
+const mysql = require("mysql2");
 
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use('/api', routes);
-
-
-// Not Found response for unmatched routes
-app.use((req, res) => {
-  res.status(404).end();
-});
-
-
-// Start server after DB connection
-db.connect(err => {
-  if (err) throw err;
-  console.log("Database connected.");
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Connect to database
+const db = mysql.createConnection({
+    host: 'localhost',
+    // Your MySQL username,
+    user: 'root',
+    // Your MySQL password
+    password: 'MySql2021!!',
+    database: 'employee_tracker'
   });
+
+db.connect(function (err) {
+  if (err) throw err;
+  console.log("connected to database");
+  console.log(`
+`)
+  // runs the app
+  // Prompt();
 });
+
+
+
+
+
