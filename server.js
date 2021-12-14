@@ -15,6 +15,7 @@ app.use(express.json());
 //   res.status(404).end();
 // });
 
+
 // Start server after DB connection
 db.connect(err => {
   if (err) throw err;
