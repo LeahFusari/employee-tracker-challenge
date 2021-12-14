@@ -11,9 +11,9 @@ app.use(express.json());
 
 
 // Not Found response for unmatched routes
-app.use((req, res) => {
-  res.status(404).end();
-});
+// app.use((req, res) => {
+//   res.status(404).end();
+// });
 
 // Start server after DB connection
 db.connect(err => {
