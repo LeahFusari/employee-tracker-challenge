@@ -52,8 +52,8 @@ function viewAllEmployees() {
     roles.title AS Position, roles.salary, depts.dept_name AS department, employees.manager_id
     FROM employees  
     JOIN roles ON roles.id = employees.role_id  
-    JOIN depts ON roles.dept_id = depts.id 
-    ORDER BY employees.id; 
+    JOIN depts ON roles.dept_id = depts.id
+    ORDER BY employees.id;
     `
     //LEFT JOIN roles ON employees.role_id = roles.id;
   db.query(query, function (err, res) {
