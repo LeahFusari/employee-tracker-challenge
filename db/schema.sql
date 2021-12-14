@@ -11,12 +11,18 @@ CREATE TABLE depts (
 CREATE TABLE roles (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30) NOT NULL,
-  salary DECIMAL
+  salary DECIMAL,
+  dept_id INTEGER
+  -- CONSTRAINT fk_deptId FOREIGN KEY (dept_id) 
+  -- REFERENCES depts(id)
 );
 
 CREATE TABLE employees (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30) NOT NULL,
   last_name VARCHAR(30) NOT NULL,
+  role_id INTEGER,
   manager_id INTEGER
+  -- CONSTRAINT fk_roleId FOREIGN KEY (role_id) 
+  -- REFERENCES roles(id)
 );

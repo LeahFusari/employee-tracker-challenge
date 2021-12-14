@@ -26,7 +26,7 @@ function initPrompts(){
     name: "task",
     message: "What would you like to do?",
     choices: [
-      "View Employees",
+      "View All Employees",
       "View Employees by Department",
       "Add Employee",
       "Remove Employees",
@@ -34,9 +34,35 @@ function initPrompts(){
       "Add Role",
       "End"]
   })
-};
+  .then(function ({ task }) {
+    switch (task) {
+      case "View All Employees":
+        viewAllEmployees();
+        break;
+    
+      }
+});
+}
 
+function viewAllEmployees() {
 
+  console.log("Viewing All Employees\n");
+  var query =
+    `SELECT employees.id, CONCAT(first_name,' ',last_name) AS Employee_Name, 
+    roles.title AS Position, roles.salary, depts.dept_name AS department, employees.manager_id
+    FROM employees  
+    JOIN roles ON roles.id = employees.role_id  
+    JOIN depts ON roles.dept_id = depts.id 
+    ORDER BY employees.id; 
+    `
+    //LEFT JOIN roles ON employees.role_id = roles.id;
+  db.query(query, function (err, res) {
+    if (err) throw err;
 
+    console.table(res);
+    console.log("Employees viewed!");
+    // initPrompts();
+  });
 
+}
 
