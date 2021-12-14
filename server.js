@@ -1,19 +1,19 @@
 const db = require('./db/connection');
 const express = require('express');
-// const apiRoutes = require('./routes/apiRoutes');
+const routes = require('./routes');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
 // Express middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-// app.use('/api', apiRoutes);
+app.use('/api', routes);
 
 
 // Not Found response for unmatched routes
-// app.use((req, res) => {
-//   res.status(404).end();
-// });
+app.use((req, res) => {
+  res.status(404).end();
+});
 
 
 // Start server after DB connection
