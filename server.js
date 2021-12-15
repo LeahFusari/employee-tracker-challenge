@@ -27,21 +27,30 @@ function initPrompts(){
     message: "What would you like to do?",
     choices: [
       "View All Employees",
-      "View Employees by Department",
-      "Add Employee",
-      "Remove Employees",
+      "View All Departments",
+      "View All Roles",
+      "Add an Employee",
+      "Add a Department",
       "Update Employee Role",
-      "Add Role",
+      "Add a Role",
       "End"]
   })
   .then(function ({ task }) {
     switch (task) {
+
       case "View All Employees":
         viewAllEmployees();
         break;
-    
+
+      case 'View All Departments':
+        viewDepts();
+        break;
+
+      case 'View All Roles':
+        viewRoles();
+        break;  
       }
-});
+    });
 }
 
 function viewAllEmployees() {
@@ -55,14 +64,45 @@ function viewAllEmployees() {
     JOIN depts ON roles.dept_id = depts.id
     ORDER BY employees.id;
     `
-    //LEFT JOIN roles ON employees.role_id = roles.id;
+   
   db.query(query, function (err, res) {
     if (err) throw err;
 
     console.table(res);
     console.log("Employees viewed!");
-    // initPrompts();
+    initPrompts();
   });
-
 }
 
+function viewDepts() {
+
+  console.log("Viewing Departments\n");
+  var query =
+    `SELECT * FROM depts`
+   
+  db.query(query, function (err, res) {
+    if (err) throw err;
+
+    console.table(res);
+    console.log("Departments viewed!");
+    initPrompts();
+  });
+}
+
+function viewRoles() {
+
+  console.log("Viewing All Roles\n");
+  var query =
+    `SELECT roles.id, roles.title AS Position, depts.dept_name AS department, roles.salary
+    FROM roles
+    JOIN depts ON roles.dept_id = depts.id
+    ORDER BY roles.id;
+    `
+   
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    console.log("Roles viewed!");
+    initPrompts();
+  });
+}
