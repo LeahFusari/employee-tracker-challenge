@@ -56,13 +56,23 @@ function initPrompts(){
 function viewAllEmployees() {
 
   console.log("Viewing All Employees\n");
+  // var query =
+  //   `SELECT employees.id, first_name, last_name, roles.title,
+  //   roles.salary, depts.dept_name AS department, employees.manager_id, manager.last_name
+  //   FROM employees
+  //   JOIN roles ON roles.id = employees.role_id  
+  //   JOIN depts ON roles.dept_id = depts.id
+  //   ORDER BY employees.id;
+  //   `
+
   var query =
-    `SELECT employees.id, CONCAT(first_name,' ',last_name) AS Employee_Name, 
-    roles.title AS Position, roles.salary, depts.dept_name AS department, employees.manager_id
-    FROM employees  
-    JOIN roles ON roles.id = employees.role_id  
-    JOIN depts ON roles.dept_id = depts.id
-    ORDER BY employees.id;
+    `SELECT e.id, e.first_name, e.last_name, roles.title,
+    roles.salary, depts.dept_name AS department, m.id, CONCAT(m.first_name, ' ' , m.last_name) AS Manager
+    FROM employees e
+    LEFT JOIN roles ON e.role_id = roles.id  
+    LEFT JOIN depts ON roles.dept_id = depts.id
+    LEFT JOIN employees m ON e.manager_id = m.id
+    ORDER BY e.id;
     `
    
   db.query(query, function (err, res) {
@@ -70,7 +80,7 @@ function viewAllEmployees() {
 
     console.table(res);
     console.log("Employees viewed!");
-    initPrompts();
+    // initPrompts();
   });
 }
 
@@ -85,7 +95,7 @@ function viewDepts() {
 
     console.table(res);
     console.log("Departments viewed!");
-    initPrompts();
+    // initPrompts();
   });
 }
 
@@ -103,6 +113,6 @@ function viewRoles() {
     if (err) throw err;
     console.table(res);
     console.log("Roles viewed!");
-    initPrompts();
+    // initPrompts();
   });
 }
