@@ -5,6 +5,7 @@ const mysql = require("mysql2");
 // Connect to database
 const db = mysql.createConnection({
     host: 'localhost',
+    port: 3306,
     // Your MySQL username,
     user: 'root',
     // Your MySQL password
@@ -48,12 +49,16 @@ function initPrompts(){
 
       case 'View All Roles':
         viewRoles();
-        break;  
+        break;
+
+      case 'Add a Department':
+        addDept();
+        break; 
       }
     });
 }
 
-function viewAllEmployees() {
+const viewAllEmployees = () => {
 
   console.log("Viewing All Employees\n");
   var query =
@@ -74,7 +79,7 @@ function viewAllEmployees() {
   });
 }
 
-function viewDepts() {
+const viewDepts = () => {
 
   console.log("Viewing Departments\n");
   var query =
@@ -89,11 +94,11 @@ function viewDepts() {
   });
 }
 
-function viewRoles() {
+const viewRoles = () => {
 
   console.log("Viewing All Roles\n");
   var query =
-    `SELECT roles.id, roles.title AS Position, depts.dept_name AS department, roles.salary
+    `SELECT roles.id, roles.title, depts.dept_name AS department, roles.salary
     FROM roles
     JOIN depts ON roles.dept_id = depts.id
     ORDER BY roles.id;
@@ -106,3 +111,34 @@ function viewRoles() {
     // initPrompts();
   });
 }
+
+const addDept = () => {
+
+  console.log("Add a Department\n");
+
+  inquirer.prompt([
+    {
+        name: "dept_name",
+        type: "input",
+        message: "Enter Department Name"
+    }
+]).then((answer) => {
+
+  const sql = `INSERT INTO depts (dept_name) VALUES (?)`;
+  const params = [answer.dept_name];
+
+  db.query(sql, params, (err, res) => {
+  if (err) throw err;
+  console.log('The new department entered has been added successfully to the database.');
+
+      db.query(`SELECT * FROM depts`, (err, res) => {
+          if (err) {
+              res.status(500).json({ error: err.message })
+              return;
+          }
+          console.table(res);
+        //  initPrompts()
+      });
+  });
+  });
+};
