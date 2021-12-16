@@ -54,6 +54,10 @@ function initPrompts(){
       case 'Add a Department':
         addDept();
         break; 
+
+      case 'Add a Role':
+        addRole();
+        break; 
       }
     });
 }
@@ -124,14 +128,49 @@ const addDept = () => {
     }
 ]).then((answer) => {
 
-  const sql = `INSERT INTO depts (dept_name) VALUES (?)`;
-  const params = [answer.dept_name];
-
-  db.query(sql, params, (err, res) => {
+  db.query(`INSERT INTO depts (dept_name) VALUES (?)`,[answer.dept_name], (err, res) => {
   if (err) throw err;
-  console.log('The new department entered has been added successfully to the database.');
+  console.log('The new department was successfully added!');
 
       db.query(`SELECT * FROM depts`, (err, res) => {
+          if (err) {
+              res.status(500).json({ error: err.message })
+              return;
+          }
+          console.table(res);
+        //  initPrompts()
+      });
+  });
+  });
+};
+
+const addRole = () => {
+
+  console.log("Add a Role\n");
+
+  inquirer.prompt([
+    {
+        name: "title",
+        type: "input",
+        message: "Please enter the title of role."
+    },
+    {
+        name: "salary",
+        type: "input",
+        message: "Please enter the role salary (decimal)"
+    },
+    {
+        name: "dept_id",
+        type: "number",
+        message: "Please enter the department id for the role."
+    }
+]).then((answer) => {
+
+  db.query(`INSERT INTO roles (title, salary, dept_id) VALUES (?, ?, ?)`, [answer.title, answer.salary, answer.dept_id], (err, res) => {
+  if (err) throw err;
+  console.log('The new role was successfully added!');
+
+      db.query(`SELECT * FROM roles`, (err, res) => {
           if (err) {
               res.status(500).json({ error: err.message })
               return;
