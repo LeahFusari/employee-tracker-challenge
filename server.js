@@ -13,7 +13,7 @@ const db = mysql.createConnection({
     database: 'employee_tracker'
   });
 
-db.connect(function (err) {
+db.connect(function (err) { //CHANGE TO ARROW FUNCTION
   if (err) throw err;
   console.log(`Welcome to the EMPLOYEE MANAGER`)
 
@@ -21,7 +21,7 @@ db.connect(function (err) {
   initPrompts()
 });
 
-function initPrompts(){
+function initPrompts(){ //CHANGE TO ARROW FUNCTION
   inquirer.prompt({
     type: "list",
     name: "task",
@@ -36,7 +36,7 @@ function initPrompts(){
       "Add a Role",
       "End"]
   })
-  .then(function ({ task }) {
+  .then(function ({ task }) { //CHANGE TO ARROW FUNCTION
     switch (task) {
 
       case "View All Employees":
@@ -58,6 +58,10 @@ function initPrompts(){
       case 'Add a Role':
         addRole();
         break; 
+
+      case 'Add an Employee':
+      addEmp();
+      break;
       }
     });
 }
@@ -74,7 +78,7 @@ const viewAllEmployees = () => {
     ORDER BY employees.id;
     `
    
-  db.query(query, function (err, res) {
+  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
 
     console.table(res);
@@ -89,7 +93,7 @@ const viewDepts = () => {
   var query =
     `SELECT * FROM depts`
    
-  db.query(query, function (err, res) {
+  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
 
     console.table(res);
@@ -108,7 +112,7 @@ const viewRoles = () => {
     ORDER BY roles.id;
     `
    
-  db.query(query, function (err, res) {
+  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
     console.table(res);
     console.log("Roles viewed!");
@@ -166,11 +170,59 @@ const addRole = () => {
     }
 ]).then((answer) => {
 
-  db.query(`INSERT INTO roles (title, salary, dept_id) VALUES (?, ?, ?)`, [answer.title, answer.salary, answer.dept_id], (err, res) => {
-  if (err) throw err;
-  console.log('The new role was successfully added!');
+  db.query(`INSERT INTO roles (title, salary, dept_id) VALUES (?, ?, ?)`, 
+  [answer.title, answer.salary, answer.dept_id], (err, res) => {
+  
+    if (err) throw err;
+      console.log('The new role was successfully added!');
 
       db.query(`SELECT * FROM roles`, (err, res) => {
+          if (err) {
+              res.status(500).json({ error: err.message })
+              return;
+          }
+          console.table(res);
+        //  initPrompts()
+      });
+  });
+  });
+};
+
+const addEmp = () => {
+
+  console.log("Add an Employee\n");
+
+  inquirer.prompt([
+    {
+      name: "first_name",
+      type: "input",
+      message: "Please enter employee first name."
+  },
+  {
+      name: "last_name",
+      type: "input",
+      message: "Please enter employee last name."
+  },
+  {
+      name: "role_id",
+      type: "number",
+      message: "Please enter the role id number for the employee."
+  },
+  {
+      name: "manager_id",
+      type: "number",
+      message: "Please enter the employee number of the manager for this employee."
+  }
+
+]).then((answer) => {
+
+  db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, 
+  [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
+  
+    if (err) throw err;
+      console.log('The new employee was successfully added!');
+
+      db.query(`SELECT * FROM employees`, (err, res) => {
           if (err) {
               res.status(500).json({ error: err.message })
               return;
