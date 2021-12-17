@@ -241,25 +241,31 @@ const addEmp = () => {
           choices: mgrChoices
         }
       ])
-      
-      .then((answer) => {
 
-        db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-          [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
+        .then((answer) => {
 
-            if (err) throw err;
-            console.log('The new employee was successfully added!');
+          db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+            [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
 
-            db.query(`SELECT * FROM employees`, (err, res) => {
-              if (err) {
-                res.status(500).json({ error: err.message })
-                return;
-              }
-              console.table(res);
-              initPrompts()
+              if (err) throw err;
+              console.log('The new employee was successfully added!');
+
+              db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title,
+                roles.salary, depts.dept_name AS department, CONCAT(manager.first_name,' ',manager.last_name) AS manager
+                FROM employees
+                LEFT JOIN roles ON roles.id = employees.role_id  
+                LEFT JOIN depts ON roles.dept_id = depts.id
+                LEFT JOIN employees manager ON manager.id = employees.manager_id
+                ORDER BY employees.id;`, (err, res) => {
+                  if (err) {
+                    res.status(500).json({ error: err.message })
+                    return;
+                  }
+                  console.table(res);
+                  initPrompts()
+              })
             })
-          })
-      })
+        })
     })
   })
 };
