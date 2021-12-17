@@ -70,11 +70,12 @@ const viewAllEmployees = () => {
 
   console.log("Viewing All Employees\n");
   var query =
-    `SELECT employees.id, first_name, last_name, roles.title,
-    roles.salary, depts.dept_name AS department, employees.manager_id
+    `SELECT employees.id, employees.first_name, employees.last_name, roles.title,
+    roles.salary, depts.dept_name AS department, manager.first_name AS manager
     FROM employees
-    JOIN roles ON roles.id = employees.role_id  
-    JOIN depts ON roles.dept_id = depts.id
+    LEFT JOIN roles ON roles.id = employees.role_id  
+    LEFT JOIN depts ON roles.dept_id = depts.id
+    LEFT JOIN employees manager ON manager.id = employees.manager_id
     ORDER BY employees.id;
     `
    
@@ -83,7 +84,7 @@ const viewAllEmployees = () => {
 
     console.table(res);
     console.log("Employees viewed!");
-    // initPrompts();
+    initPrompts();
   });
 }
 
@@ -98,7 +99,7 @@ const viewDepts = () => {
 
     console.table(res);
     console.log("Departments viewed!");
-    // initPrompts();
+    initPrompts();
   });
 }
 
@@ -116,7 +117,7 @@ const viewRoles = () => {
     if (err) throw err;
     console.table(res);
     console.log("Roles viewed!");
-    // initPrompts();
+    initPrompts();
   });
 }
 
@@ -142,7 +143,7 @@ const addDept = () => {
               return;
           }
           console.table(res);
-        //  initPrompts()
+         initPrompts()
       });
   });
   });
@@ -151,6 +152,14 @@ const addDept = () => {
 const addRole = () => {
 
   console.log("Add a Role\n");
+
+  db.query(`SELECT * FROM depts`, (err, res) => {
+    var departmentChoices = res.map(department => ({
+      name: department.dept_name,
+      value: department.id
+    }))
+      console.log(departmentChoices)
+  
 
   inquirer.prompt([
     {
@@ -165,8 +174,9 @@ const addRole = () => {
     },
     {
         name: "dept_id",
-        type: "number",
-        message: "Please enter the department id for the role."
+        type: "list",
+        message: "Please choose a department for the role.",
+        choices: departmentChoices
     }
 ]).then((answer) => {
 
@@ -182,10 +192,11 @@ const addRole = () => {
               return;
           }
           console.table(res);
-        //  initPrompts()
+         initPrompts()
       });
   });
   });
+})
 };
 
 const addEmp = () => {
@@ -228,7 +239,7 @@ const addEmp = () => {
               return;
           }
           console.table(res);
-        //  initPrompts()
+         initPrompts()
       });
   });
   });
