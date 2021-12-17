@@ -4,14 +4,14 @@ const mysql = require("mysql2");
 
 // Connect to database
 const db = mysql.createConnection({
-    host: 'localhost',
-    port: 3306,
-    // Your MySQL username,
-    user: 'root',
-    // Your MySQL password
-    password: 'MySql2021!!',
-    database: 'employee_tracker'
-  });
+  host: 'localhost',
+  port: 3306,
+  // Your MySQL username,
+  user: 'root',
+  // Your MySQL password
+  password: 'MySql2021!!',
+  database: 'employee_tracker'
+});
 
 db.connect(function (err) { //CHANGE TO ARROW FUNCTION
   if (err) throw err;
@@ -21,7 +21,7 @@ db.connect(function (err) { //CHANGE TO ARROW FUNCTION
   initPrompts()
 });
 
-function initPrompts(){ //CHANGE TO ARROW FUNCTION
+function initPrompts() { //CHANGE TO ARROW FUNCTION
   inquirer.prompt({
     type: "list",
     name: "task",
@@ -36,32 +36,32 @@ function initPrompts(){ //CHANGE TO ARROW FUNCTION
       "Add a Role",
       "End"]
   })
-  .then(function ({ task }) { //CHANGE TO ARROW FUNCTION
-    switch (task) {
+    .then(function ({ task }) { //CHANGE TO ARROW FUNCTION
+      switch (task) {
 
-      case "View All Employees":
-        viewAllEmployees();
-        break;
+        case "View All Employees":
+          viewAllEmployees();
+          break;
 
-      case 'View All Departments':
-        viewDepts();
-        break;
+        case 'View All Departments':
+          viewDepts();
+          break;
 
-      case 'View All Roles':
-        viewRoles();
-        break;
+        case 'View All Roles':
+          viewRoles();
+          break;
 
-      case 'Add a Department':
-        addDept();
-        break; 
+        case 'Add a Department':
+          addDept();
+          break;
 
-      case 'Add a Role':
-        addRole();
-        break; 
+        case 'Add a Role':
+          addRole();
+          break;
 
-      case 'Add an Employee':
-      addEmp();
-      break;
+        case 'Add an Employee':
+          addEmp();
+          break;
       }
     });
 }
@@ -79,7 +79,7 @@ const viewAllEmployees = () => {
     LEFT JOIN employees manager ON manager.id = employees.manager_id
     ORDER BY employees.id;
     `
-   
+
   db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
 
@@ -94,7 +94,7 @@ const viewDepts = () => {
   console.log("Viewing Departments\n");
   var query =
     `SELECT * FROM depts`
-   
+
   db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
 
@@ -113,7 +113,7 @@ const viewRoles = () => {
     JOIN depts ON roles.dept_id = depts.id
     ORDER BY roles.id;
     `
-   
+
   db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
     if (err) throw err;
     console.table(res);
@@ -128,25 +128,25 @@ const addDept = () => {
 
   inquirer.prompt([
     {
-        name: "dept_name",
-        type: "input",
-        message: "Enter Department Name"
+      name: "dept_name",
+      type: "input",
+      message: "Enter Department Name"
     }
-]).then((answer) => {
+  ]).then((answer) => {
 
-  db.query(`INSERT INTO depts (dept_name) VALUES (?)`,[answer.dept_name], (err, res) => {
-  if (err) throw err;
-  console.log('The new department was successfully added!');
+    db.query(`INSERT INTO depts (dept_name) VALUES (?)`, [answer.dept_name], (err, res) => {
+      if (err) throw err;
+      console.log('The new department was successfully added!');
 
       db.query(`SELECT * FROM depts`, (err, res) => {
-          if (err) {
-              res.status(500).json({ error: err.message })
-              return;
-          }
-          console.table(res);
-         initPrompts()
+        if (err) {
+          res.status(500).json({ error: err.message })
+          return;
+        }
+        console.table(res);
+        initPrompts()
       });
-  });
+    });
   });
 };
 
@@ -159,45 +159,45 @@ const addRole = () => {
       name: department.dept_name,
       value: department.id
     }))
-      // console.log(departmentChoices)
-  
+    // console.log(departmentChoices)
 
-  inquirer.prompt([
-    {
+
+    inquirer.prompt([
+      {
         name: "title",
         type: "input",
         message: "Please enter the title of role."
-    },
-    {
+      },
+      {
         name: "salary",
         type: "input",
         message: "Please enter the role salary (decimal)"
-    },
-    {
+      },
+      {
         name: "dept_id",
         type: "list",
         message: "Please choose a department for the role.",
         choices: departmentChoices
-    }
-]).then((answer) => {
+      }
+    ]).then((answer) => {
 
-  db.query(`INSERT INTO roles (title, salary, dept_id) VALUES (?, ?, ?)`, 
-  [answer.title, answer.salary, answer.dept_id], (err, res) => {
-  
-    if (err) throw err;
-      console.log('The new role was successfully added!');
+      db.query(`INSERT INTO roles (title, salary, dept_id) VALUES (?, ?, ?)`,
+        [answer.title, answer.salary, answer.dept_id], (err, res) => {
 
-      db.query(`SELECT * FROM roles`, (err, res) => {
-          if (err) {
+          if (err) throw err;
+          console.log('The new role was successfully added!');
+
+          db.query(`SELECT * FROM roles`, (err, res) => {
+            if (err) {
               res.status(500).json({ error: err.message })
               return;
-          }
-          console.table(res);
-         initPrompts()
-      });
-  });
-  });
-})
+            }
+            console.table(res);
+            initPrompts()
+          });
+        });
+    });
+  })
 };
 
 const addEmp = () => {
@@ -210,94 +210,56 @@ const addEmp = () => {
       value: role.id
     }))
 
-    inquirer.prompt([
-    {
-        name: "first_name",
-        type: "input",
-        message: "Please enter the NEW EMPLOYEE first name."
-    },
-    {
-        name: "last_name",
-        type: "input",
-        message: "Please enter the NEW EMPLOYEE last name."
-    },
-    {
-        name: "role_id",
-        type: "list",
-        message: "Please choose a ROLE for the NEW EMPLOYEE.",
-        choices: roleChoices
-    },
-    // {
-    //     name: "manager_id",
-    //     type: "list",
-    //     message: "Please choose a Manager for the NEW EMPLOYEE.",
-    //     choices: mgrChoices
-    // }
-]
-    
-    ).then((answer) => {
+    db.query(`SELECT * FROM employees`, (err, res) => {
+      var mgrChoices = res.map(manager => ({
+        name: manager.first_name,
+        value: manager.id
+      }))
 
-      db.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES (?, ?, ?)`, 
-    [answer.first_name, answer.last_name, answer.role_id], (err, res) => {
-  
-    if (err) throw err;
-      console.log('The new employee was successfully added!');
 
-      db.query(`SELECT * FROM employees`, (err, res) => {
-          if (err) {
-              res.status(500).json({ error: err.message })
-              return;
-          }
-          console.table(res);
-         initPrompts()
-      });
-    });
-  });
-})
+      inquirer.prompt([
+        {
+          name: "first_name",
+          type: "input",
+          message: "Please enter the NEW EMPLOYEE first name."
+        },
+        {
+          name: "last_name",
+          type: "input",
+          message: "Please enter the NEW EMPLOYEE last name."
+        },
+        {
+          name: "role_id",
+          type: "list",
+          message: "Please choose a ROLE for the NEW EMPLOYEE.",
+          choices: roleChoices
+        },
+        {
+          name: "manager_id",
+          type: "list",
+          message: "Please choose a Manager for the NEW EMPLOYEE.",
+          choices: mgrChoices
+        }
+      ])
+      
+      .then((answer) => {
+
+        db.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES (?, ?, ?)`,
+          [answer.first_name, answer.last_name, answer.role_id], (err, res) => {
+
+            if (err) throw err;
+            console.log('The new employee was successfully added!');
+
+            db.query(`SELECT * FROM employees`, (err, res) => {
+              if (err) {
+                res.status(500).json({ error: err.message })
+                return;
+              }
+              console.table(res);
+              initPrompts()
+            })
+          })
+      })
+    })
+  }
 };
-
-// const addEmp = () => {
-
-//   console.log("Add an Employee\n");
-
-//   inquirer.prompt([
-//     {
-//       name: "first_name",
-//       type: "input",
-//       message: "Please enter employee first name."
-//   },
-//   {
-//       name: "last_name",
-//       type: "input",
-//       message: "Please enter employee last name."
-//   },
-//   {
-//       name: "role_id",
-//       type: "number",
-//       message: "Please enter the role id number for the employee."
-//   },
-//   {
-//       name: "manager_id",
-//       type: "number",
-//       message: "Please enter the employee number of the manager for this employee."
-//   }
-
-// ]).then((answer) => {
-
-//   db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, 
-//   [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
-  
-//     if (err) throw err;
-//       console.log('The new employee was successfully added!');
-
-//       db.query(`SELECT * FROM employees`, (err, res) => {
-//           if (err) {
-//               res.status(500).json({ error: err.message })
-//               return;
-//           }
-//           console.table(res);
-//          initPrompts()
-//       });
-//   });
-//   });
-// };
