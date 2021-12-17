@@ -68,10 +68,11 @@ function initPrompts(){ //CHANGE TO ARROW FUNCTION
 
 const viewAllEmployees = () => {
 
+  // for last LEFT JOIN:  <table> <new column name> ON <new column name>.<table PK id> = <table>.<field>
   console.log("Viewing All Employees\n");
   var query =
     `SELECT employees.id, employees.first_name, employees.last_name, roles.title,
-    roles.salary, depts.dept_name AS department, manager.first_name AS manager
+    roles.salary, depts.dept_name AS department, CONCAT(manager.first_name,' ',manager.last_name) AS manager
     FROM employees
     LEFT JOIN roles ON roles.id = employees.role_id  
     LEFT JOIN depts ON roles.dept_id = depts.id
@@ -158,7 +159,7 @@ const addRole = () => {
       name: department.dept_name,
       value: department.id
     }))
-      console.log(departmentChoices)
+      // console.log(departmentChoices)
   
 
   inquirer.prompt([
@@ -203,32 +204,40 @@ const addEmp = () => {
 
   console.log("Add an Employee\n");
 
-  inquirer.prompt([
+  db.query(`SELECT * FROM roles`, (err, res) => {
+    var roleChoices = res.map(role => ({
+      name: role.title,
+      value: role.id
+    }))
+
+    inquirer.prompt([
     {
-      name: "first_name",
-      type: "input",
-      message: "Please enter employee first name."
-  },
-  {
-      name: "last_name",
-      type: "input",
-      message: "Please enter employee last name."
-  },
-  {
-      name: "role_id",
-      type: "number",
-      message: "Please enter the role id number for the employee."
-  },
-  {
-      name: "manager_id",
-      type: "number",
-      message: "Please enter the employee number of the manager for this employee."
-  }
+        name: "first_name",
+        type: "input",
+        message: "Please enter the NEW EMPLOYEE first name."
+    },
+    {
+        name: "last_name",
+        type: "input",
+        message: "Please enter the NEW EMPLOYEE last name."
+    },
+    {
+        name: "role_id",
+        type: "list",
+        message: "Please choose a ROLE for the NEW EMPLOYEE.",
+        choices: roleChoices
+    },
+    // {
+    //     name: "manager_id",
+    //     type: "list",
+    //     message: "Please choose a Manager for the NEW EMPLOYEE.",
+    //     choices: mgrChoices
+    // }
 
-]).then((answer) => {
+    ]).then((answer) => {
 
-  db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, 
-  [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
+      db.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES (?, ?, ?)`, 
+    [answer.first_name, answer.last_name, answer.role_id], (err, res) => {
   
     if (err) throw err;
       console.log('The new employee was successfully added!');
@@ -241,6 +250,53 @@ const addEmp = () => {
           console.table(res);
          initPrompts()
       });
+    });
   });
-  });
+})
 };
+
+// const addEmp = () => {
+
+//   console.log("Add an Employee\n");
+
+//   inquirer.prompt([
+//     {
+//       name: "first_name",
+//       type: "input",
+//       message: "Please enter employee first name."
+//   },
+//   {
+//       name: "last_name",
+//       type: "input",
+//       message: "Please enter employee last name."
+//   },
+//   {
+//       name: "role_id",
+//       type: "number",
+//       message: "Please enter the role id number for the employee."
+//   },
+//   {
+//       name: "manager_id",
+//       type: "number",
+//       message: "Please enter the employee number of the manager for this employee."
+//   }
+
+// ]).then((answer) => {
+
+//   db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, 
+//   [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
+  
+//     if (err) throw err;
+//       console.log('The new employee was successfully added!');
+
+//       db.query(`SELECT * FROM employees`, (err, res) => {
+//           if (err) {
+//               res.status(500).json({ error: err.message })
+//               return;
+//           }
+//           console.table(res);
+//          initPrompts()
+//       });
+//   });
+//   });
+// };
