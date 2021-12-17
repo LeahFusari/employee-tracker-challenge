@@ -10,7 +10,7 @@
   "name": "employee-tracker-challenge",
   "description": "",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LeahFusari/employee-tracker-challenge.git"
