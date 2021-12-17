@@ -233,8 +233,9 @@ const addEmp = () => {
     //     message: "Please choose a Manager for the NEW EMPLOYEE.",
     //     choices: mgrChoices
     // }
-
-    ]).then((answer) => {
+]
+    
+    ).then((answer) => {
 
       db.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES (?, ?, ?)`, 
     [answer.first_name, answer.last_name, answer.role_id], (err, res) => {
