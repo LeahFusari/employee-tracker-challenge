@@ -244,8 +244,8 @@ const addEmp = () => {
       
       .then((answer) => {
 
-        db.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES (?, ?, ?)`,
-          [answer.first_name, answer.last_name, answer.role_id], (err, res) => {
+        db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+          [answer.first_name, answer.last_name, answer.role_id, answer.manager_id], (err, res) => {
 
             if (err) throw err;
             console.log('The new employee was successfully added!');
@@ -261,5 +261,5 @@ const addEmp = () => {
           })
       })
     })
-  }
+  })
 };
