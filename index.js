@@ -1,27 +1,10 @@
-const inquirer = require("inquirer");
+const db = require("./db/connection")
 require("console.table");
 const mysql = require("mysql2");
+const inquirer = require("inquirer");
 
-// Connect to database
-const db = mysql.createConnection({
-  host: 'localhost',
-  port: 3306,
-  // Your MySQL username,
-  user: 'root',
-  // Your MySQL password
-  password: 'MySql2021!!',
-  database: 'employee_tracker'
-});
 
-db.connect(function (err) { //CHANGE TO ARROW FUNCTION
-  if (err) throw err;
-  console.log(`Welcome to the EMPLOYEE MANAGER`)
-
-  // function call here to start the initial app prompts
-  initPrompts()
-});
-
-function initPrompts() { //CHANGE TO ARROW FUNCTION
+const initPrompts = () => { //CHANGE TO ARROW FUNCTION
   inquirer.prompt({
     type: "list",
     name: "task",
@@ -65,7 +48,7 @@ function initPrompts() { //CHANGE TO ARROW FUNCTION
 
         case 'Update Employee Role':
           updateEmpRole();
-          break;  
+          break;
       }
     });
 }
@@ -210,7 +193,7 @@ const addEmp = () => {
 
   console.log("Add an Employee\n");
 
-  db.query(`SELECT * FROM roles`, (err, res) => {
+  db.query(`SELECT * FROM roles ORDER BY title`, (err, res) => {
     var roleChoices = res.map(role => ({
       name: role.title,
       value: role.id
@@ -262,12 +245,12 @@ const addEmp = () => {
                 LEFT JOIN depts ON roles.dept_id = depts.id
                 LEFT JOIN employees manager ON manager.id = employees.manager_id
                 ORDER BY employees.id;`, (err, res) => {
-                  if (err) {
-                    res.status(500).json({ error: err.message })
-                    return;
-                  }
-                  console.table(res);
-                  initPrompts()
+                if (err) {
+                  res.status(500).json({ error: err.message })
+                  return;
+                }
+                console.table(res);
+                initPrompts()
               })
             })
         })
@@ -285,13 +268,50 @@ const updateEmpRole = () => {
       value: emp.id
     }))
 
-    inquirer.prompt([
-      {
-        name: "employee",
-        type: "list",
-        message: "Please choose an employee who's roll you wish to change.",
-        choices: empChoices
-      }
-    ])
+    db.query(`SELECT * FROM roles ORDER BY title`, (err, res) => {
+      var roleChoices = res.map(role => ({
+        name: role.title,
+        value: role.id
+      }))
+
+      inquirer.prompt([
+        {
+          name: "employee",
+          type: "list",
+          message: "Please choose an employee who's roll you wish to update.",
+          choices: empChoices
+        },
+        {
+          name: "role",
+          type: "list",
+          message: "Please choose a roll you wish to update for the employee.",
+          choices: roleChoices
+        }
+      ])
+        .then((answer) => {
+          db.query(`UPDATE employees SET role_id = ${answer.role} WHERE id = ${answer.employee}`, (err, res) => {
+
+              if (err) throw err;
+              console.log('Update to employee role was successful!');
+
+              db.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title,
+              roles.salary, depts.dept_name AS department, CONCAT(manager.first_name,' ',manager.last_name) AS manager
+              FROM employees
+              LEFT JOIN roles ON roles.id = employees.role_id  
+              LEFT JOIN depts ON roles.dept_id = depts.id
+              LEFT JOIN employees manager ON manager.id = employees.manager_id
+              ORDER BY employees.last_name;`, (err, res) => {
+              if (err) {
+                res.status(500).json({ error: err.message })
+                return;
+              }
+              console.table(res);
+              initPrompts()
+            })
+            
+            })
+        })
+    })
   })
 };
+initPrompts()
