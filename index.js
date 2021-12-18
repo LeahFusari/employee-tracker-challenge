@@ -62,6 +62,10 @@ function initPrompts() { //CHANGE TO ARROW FUNCTION
         case 'Add an Employee':
           addEmp();
           break;
+
+        case 'Update Employee Role':
+          updateEmpRole();
+          break;  
       }
     });
 }
@@ -159,8 +163,6 @@ const addRole = () => {
       name: department.dept_name,
       value: department.id
     }))
-    // console.log(departmentChoices)
-
 
     inquirer.prompt([
       {
@@ -187,7 +189,11 @@ const addRole = () => {
           if (err) throw err;
           console.log('The new role was successfully added!');
 
-          db.query(`SELECT * FROM roles`, (err, res) => {
+          db.query(`SELECT roles.id, roles.title, depts.dept_name AS department, roles.salary
+          FROM roles
+          JOIN depts ON roles.dept_id = depts.id
+          ORDER BY roles.id;
+          `, (err, res) => {
             if (err) {
               res.status(500).json({ error: err.message })
               return;
@@ -212,10 +218,9 @@ const addEmp = () => {
 
     db.query(`SELECT * FROM employees`, (err, res) => {
       var mgrChoices = res.map(manager => ({
-        name: manager.first_name,
+        name: manager.first_name + " " + manager.last_name,
         value: manager.id
       }))
-
 
       inquirer.prompt([
         {
@@ -267,5 +272,26 @@ const addEmp = () => {
             })
         })
     })
+  })
+};
+
+const updateEmpRole = () => {
+
+  console.log("Select an Employee to Update.\n");
+
+  db.query(`SELECT * FROM employees ORDER BY last_name`, (err, res) => {
+    var empChoices = res.map(emp => ({
+      name: emp.first_name + " " + emp.last_name,
+      value: emp.id
+    }))
+
+    inquirer.prompt([
+      {
+        name: "employee",
+        type: "list",
+        message: "Please choose an employee who's roll you wish to change.",
+        choices: empChoices
+      }
+    ])
   })
 };
