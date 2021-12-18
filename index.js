@@ -1,10 +1,10 @@
 const db = require("./db/connection")
 require("console.table");
-const mysql = require("mysql2");
 const inquirer = require("inquirer");
 
 
-const initPrompts = () => { //CHANGE TO ARROW FUNCTION
+
+const initPrompts = () => {
   inquirer.prompt({
     type: "list",
     name: "task",
@@ -15,11 +15,11 @@ const initPrompts = () => { //CHANGE TO ARROW FUNCTION
       "View All Roles",
       "Add an Employee",
       "Add a Department",
-      "Update Employee Role",
       "Add a Role",
-      "End"]
+      "Update Employee Role",
+      "Exit"]
   })
-    .then(function ({ task }) { //CHANGE TO ARROW FUNCTION
+    .then(function ({ task }) {
       switch (task) {
 
         case "View All Employees":
@@ -49,6 +49,9 @@ const initPrompts = () => { //CHANGE TO ARROW FUNCTION
         case 'Update Employee Role':
           updateEmpRole();
           break;
+
+        case 'Exit':
+          process.exit()
       }
     });
 }
@@ -67,7 +70,7 @@ const viewAllEmployees = () => {
     ORDER BY employees.id;
     `
 
-  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
+  db.query(query, function (err, res) {
     if (err) throw err;
 
     console.table(res);
@@ -82,7 +85,7 @@ const viewDepts = () => {
   var query =
     `SELECT * FROM depts`
 
-  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
+  db.query(query, function (err, res) {
     if (err) throw err;
 
     console.table(res);
@@ -101,7 +104,7 @@ const viewRoles = () => {
     ORDER BY roles.id;
     `
 
-  db.query(query, function (err, res) { //CHANGE TO ARROW FUNCTION
+  db.query(query, function (err, res) { 
     if (err) throw err;
     console.table(res);
     console.log("Roles viewed!");
