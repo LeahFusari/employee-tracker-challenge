@@ -11,7 +11,7 @@ const db = mysql.createConnection({
   database: 'employee_tracker'
 });
 
-db.connect(function (err) { //CHANGE TO ARROW FUNCTION
+db.connect(function (err) { 
   if (err) throw err;
   console.log(`Welcome to the EMPLOYEE MANAGER`)
 

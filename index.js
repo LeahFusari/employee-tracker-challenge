@@ -3,7 +3,7 @@ require("console.table");
 const inquirer = require("inquirer");
 
 
-
+// initialize task prompts
 const initPrompts = () => {
   inquirer.prompt({
     type: "list",
@@ -19,6 +19,7 @@ const initPrompts = () => {
       "Update Employee Role",
       "Exit"]
   })
+  // function calls based on choices
     .then(function ({ task }) {
       switch (task) {
 
@@ -55,6 +56,8 @@ const initPrompts = () => {
       }
     });
 }
+
+// functions
 
 const viewAllEmployees = () => {
 
